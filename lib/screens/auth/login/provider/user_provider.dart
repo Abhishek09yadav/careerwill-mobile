@@ -14,19 +14,31 @@ class UserProvider extends ChangeNotifier {
   Future<String> login(LoginData data) async {
     try {
       Map<String, dynamic> loginData = {
-        "name": data.name.toLowerCase(),
+        "email": data.name.toLowerCase(),
         "password": data.password,
       };
+
       final res = await dio.postItems(
         endpointUrl: "/auth/login",
         data: loginData,
       );
+
       if (res.statusCode == 200) {
         final json = res.data;
-        if (json["token"] != null) {
-          String token = json["token"];
-          log("Token: $token");
 
+        if (json["token"] != null && json["user"] != null) {
+          String token = json["token"];
+          final userJson = json["user"] as Map<String, dynamic>;
+
+          // Add token into user JSON
+          userJson["token"] = token;
+
+          // Create User object
+          User user = User.fromJson(userJson);
+
+          await saveLoginInfo(user);
+
+          log("Login Successful → token: $token");
           return token;
         } else {
           throw Exception(json["message"] ?? "Login failed.");
@@ -46,8 +58,10 @@ class UserProvider extends ChangeNotifier {
   }
 
   User? getLoginUsr() {
-    Map<String, dynamic>? userJson = box.read(USER_INFO_BOX);
-    User? userLogged = User.fromJson(userJson ?? {});
-    return userLogged;
-  }
+  Map<String, dynamic>? userJson = box.read(USER_INFO_BOX);
+  if (userJson == null) return null;
+  return User.fromJson(userJson);
+}
+
+
 }
