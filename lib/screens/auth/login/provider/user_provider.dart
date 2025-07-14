@@ -4,51 +4,48 @@ import 'package:careerwill/models/user.dart';
 import 'package:careerwill/service/dio_service.dart';
 import 'package:careerwill/utitlity/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_login/flutter_login.dart';
 import 'package:get_storage/get_storage.dart';
 
 class UserProvider extends ChangeNotifier {
   DioService dio = DioService();
   final box = GetStorage();
 
-  Future<String> login(LoginData data) async {
-    try {
-      Map<String, dynamic> loginData = {
-        "email": data.name.toLowerCase(),
-        "password": data.password,
-      };
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
 
-      final res = await dio.postItems(
+  String? _message;
+  String? get message => _message;
+
+  Future<bool> login({required String email, password}) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final response = await dio.postItems(
         endpointUrl: "/auth/login",
-        data: loginData,
+        data: {"email": email, "password": password},
       );
 
-      if (res.statusCode == 200) {
-        final json = res.data;
+      if (response.statusCode == 200) {
+        _message = response.data["message"];
+        var userJson = response.data["user"];
+        User loginUser = User.fromJson(userJson);
 
-        if (json["token"] != null && json["user"] != null) {
-          String token = json["token"];
-          final userJson = json["user"] as Map<String, dynamic>;
-
-          // Add token into user JSON
-          userJson["token"] = token;
-
-          // Create User object
-          User user = User.fromJson(userJson);
-
-          await saveLoginInfo(user);
-
-          log("Login Successful → token: $token");
-          return token;
-        } else {
-          throw Exception(json["message"] ?? "Login failed.");
-        }
+        await saveLoginInfo(loginUser);
+        _isLoading = false;
+        notifyListeners();
+        return true;
       } else {
-        throw Exception("Server error: ${res.statusCode}");
+        _message = "Login failed: ${response.data}";
+        _isLoading = false;
+        notifyListeners();
+        return false;
       }
     } catch (e) {
-      log("Error in login $e");
-      rethrow;
+      _message = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
     }
   }
 
@@ -58,10 +55,17 @@ class UserProvider extends ChangeNotifier {
   }
 
   User? getLoginUsr() {
-  Map<String, dynamic>? userJson = box.read(USER_INFO_BOX);
-  if (userJson == null) return null;
-  return User.fromJson(userJson);
-}
+    Map<String, dynamic>? userJson = box.read(USER_INFO_BOX);
+    if (userJson == null) return null;
+    return User.fromJson(userJson);
+  }
 
+  Future<void> logout() async {
+    await box.erase();
+    _message = null;
+    _isLoading = false;
+    notifyListeners();
 
+    log("User logged out");
+  }
 }

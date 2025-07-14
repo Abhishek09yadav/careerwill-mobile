@@ -1,148 +1,125 @@
-import 'package:careerwill/models/user.dart';
+import 'package:careerwill/components/auth/textfield.dart';
+import 'package:careerwill/components/bgIcons.dart';
+import 'package:careerwill/components/mybutton.dart';
 import 'package:careerwill/screens/auth/login/provider/user_provider.dart';
 import 'package:careerwill/screens/home/home.dart';
-import 'package:careerwill/utitlity/app_color.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_login/flutter_login.dart';
 import 'package:provider/provider.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController emailController = TextEditingController();
+
+  final TextEditingController passwordController = TextEditingController();
+
+  final String role = "PARENT";
+
+  @override
   Widget build(BuildContext context) {
-    return FlutterLogin(
-      userType: LoginUserType.email,
-      userValidator: (value) {
-        if (value!.isEmpty) return 'Email is required';
-        if (!value.contains('@')) return 'Invalid email';
-        return null;
-      },
-      onLogin: (loginData) {
-        Provider.of<UserProvider>(context, listen: false).login(loginData);
-        return null;
-      },
-      onSubmitAnimationCompleted: () {
-        UserProvider provider = Provider.of<UserProvider>(
-          context,
-          listen: false,
-        );
-        User? user = provider.getLoginUsr();
+    final userProvider = Provider.of<UserProvider>(context);
 
-        if (user != null && user.id.isNotEmpty) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const HomeScreen()),
-          );
-        } else {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const LoginPage()),
-          );
-        }
-      },
+    return SafeArea(
+      child: Scaffold(
+        body: Stack(
+          children: [
+            BGIcons(),
 
-      onRecoverPassword: (_) => null,
-      theme: LoginTheme(
-        primaryColor: AppColor.lightBlue,
-        buttonTheme: const LoginButtonTheme(backgroundColor: AppColor.black),
-        cardTheme: const CardTheme(
-          color: Colors.white,
-          surfaceTintColor: Colors.white,
+            SingleChildScrollView(
+              child: Container(
+                height: MediaQuery.of(context).size.height,
+                width: double.infinity,
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Center(
+                      child: Image.asset(
+                        'assets/images/logo.png', // replace with your asset path
+                        height: 100,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    const Text(
+                      "Welcome to Career Will",
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+
+                    MyTextField(
+                      hintText: "Email",
+                      controller: emailController,
+                      inputType: TextInputType.emailAddress,
+                    ),
+                    const SizedBox(height: 20),
+
+                    MyTextField(
+                      hintText: "Password",
+                      controller: passwordController,
+                      obscureText: true,
+                      inputType: TextInputType.visiblePassword,
+                    ),
+                    const SizedBox(height: 20),
+
+                    userProvider.isLoading
+                        ? const CircularProgressIndicator()
+                        : MyButton(
+                            text: "Login",
+                            onPressed: () async {
+                              bool success = await userProvider.login(
+                                email: emailController.text.trim(),
+                                password: passwordController.text.trim(),
+                              );
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    userProvider.message ?? "Error",
+                                  ),
+                                ),
+                              );
+                              if (success) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const HomeScreen(),
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                    const SizedBox(height: 10),
+
+                    Center(
+                      child: TextButton(
+                        onPressed: () {},
+                        child: const Text(
+                          "Forgot Password?",
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
-        titleStyle: const TextStyle(color: Colors.black),
       ),
-      children: [
-        // Graduation hat top left
-        Positioned(
-          top: 40,
-          left: 30,
-          child: Icon(
-            Icons.school,
-            size: 60,
-            color: Colors.deepPurple.withOpacity(0.1),
-          ),
-        ),
-        // Open book top right
-        Positioned(
-          top: 80,
-          right: 20,
-          child: Icon(
-            Icons.menu_book,
-            size: 50,
-            color: Colors.blue.withOpacity(0.1),
-          ),
-        ),
-        // Pencil bottom left
-        Positioned(
-          bottom: 80,
-          left: 20,
-          child: Icon(
-            Icons.edit,
-            size: 50,
-            color: Colors.deepOrange.withOpacity(0.1),
-          ),
-        ),
-        // Graduation hat bottom right
-        Positioned(
-          bottom: 50,
-          right: 40,
-          child: Icon(
-            Icons.school,
-            size: 70,
-            color: Colors.green.withOpacity(0.1),
-          ),
-        ),
-        // Science icon center left
-        Positioned(
-          top: 200,
-          left: 10,
-          child: Icon(
-            Icons.science,
-            size: 60,
-            color: Colors.cyan.withOpacity(0.3),
-          ),
-        ),
-
-        // Computer center bottom
-        Positioned(
-          bottom: 150,
-          right: 120,
-          child: Icon(
-            Icons.computer,
-            size: 50,
-            color: Colors.indigo.withOpacity(0.3),
-          ),
-        ),
-        // Lightbulb near top
-        Positioned(
-          top: 20,
-          right: 150,
-          child: Icon(
-            Icons.lightbulb,
-            size: 40,
-            color: Colors.yellow.withOpacity(0.3),
-          ),
-        ),
-        // Backpack bottom center
-        Positioned(
-          bottom: 30,
-          left: 150,
-          child: Icon(
-            Icons.backpack,
-            size: 60,
-            color: Colors.teal.withOpacity(0.3),
-          ),
-        ),
-        // Library books center top
-        Positioned(
-          top: 150,
-          left: 120,
-          child: Icon(
-            Icons.library_books,
-            size: 50,
-            color: Colors.brown.withOpacity(0.3),
-          ),
-        ),
-      ],
     );
   }
 }
