@@ -56,8 +56,7 @@ class UserProvider extends ChangeNotifier {
 
   User? getLoginUsr() {
     Map<String, dynamic>? userJson = box.read(USER_INFO_BOX);
-    if (userJson == null) return null;
-    return User.fromJson(userJson);
+    return User.fromJson(userJson!);
   }
 
   Future<void> logout() async {
