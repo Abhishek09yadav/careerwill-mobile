@@ -1,5 +1,10 @@
+import 'dart:developer';
+
+import 'package:careerwill/models/kit.dart';
+import 'package:careerwill/models/student.dart';
 import 'package:careerwill/screens/auth/login/login.dart';
 import 'package:careerwill/screens/home/component/result.dart';
+import 'package:careerwill/screens/home/provider/home_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:careerwill/models/user.dart';
 import 'package:provider/provider.dart';
@@ -17,13 +22,18 @@ class _HomeScreenState extends State<HomeScreen> {
   String? selectedStudentName;
 
   @override
+  void initState() {
+    super.initState();
+    Provider.of<HomeProvider>(context, listen: false).fetchAllStudents();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
     User? loggedInUser = userProvider.getLoginUsr();
 
     if (loggedInUser == null) {
-      return const Scaffold(
-          body: Center(child: Text("No user logged in.")));
+      return const Scaffold(body: Center(child: Text("No user logged in.")));
     }
 
     bool isTeacher = loggedInUser.role.toLowerCase() == "teacher";
@@ -35,14 +45,17 @@ class _HomeScreenState extends State<HomeScreen> {
       body: isTeacher
           ? _buildTeacherView(context)
           : isParent
-              ? _buildParentView(context, loggedInUser.username)
-              : const Center(child: Text("Unknown user role.")),
+          ? _buildParentView(context, loggedInUser.username)
+          : const Center(child: Text("Unknown user role.")),
     );
   }
 
   /// Drawer widget
   Widget _buildDrawer(
-      BuildContext context, User user, UserProvider userProvider) {
+    BuildContext context,
+    User user,
+    UserProvider userProvider,
+  ) {
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
@@ -63,8 +76,8 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ResultScreen(
-                      studentName: user.username ?? 'Your Child'),
+                  builder: (context) =>
+                      ResultScreen(studentName: user.username ?? 'Your Child'),
                 ),
               );
             },
@@ -73,33 +86,34 @@ class _HomeScreenState extends State<HomeScreen> {
             leading: const Icon(Icons.logout),
             title: const Text('Logout'),
             onTap: () {
-  showDialog(
-    context: context,
-    builder: (ctx) => AlertDialog(
-      title: const Text("Confirm Logout"),
-      content: const Text("Are you sure you want to logout?"),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(ctx),
-          child: const Text("Cancel"),
-        ),
-        TextButton(
-          onPressed: () async {
-            Navigator.pop(ctx);
-            await userProvider.logout();
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const LoginPage()),
-              (route) => false,
-            );
-          },
-          child: const Text("Logout"),
-        ),
-      ],
-    ),
-  );
-},
-
+              showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: const Text("Confirm Logout"),
+                  content: const Text("Are you sure you want to logout?"),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: const Text("Cancel"),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        Navigator.pop(ctx);
+                        await userProvider.logout();
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LoginPage(),
+                          ),
+                          (route) => false,
+                        );
+                      },
+                      child: const Text("Logout"),
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -121,8 +135,16 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             onSubmitted: (value) {
+              log("searched for --> $value");
               setState(() {
                 selectedStudentName = value;
+              });
+
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Provider.of<HomeProvider>(
+                  context,
+                  listen: false,
+                ).searchStudents(value);
               });
             },
           ),
@@ -144,141 +166,31 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildStudentDetails(BuildContext context, String studentName) {
-    // Dummy data - replace with API data later
-    double presentPercentage = 78.5;
-    int presentDays = 17;
-    int absentDays = 5;
-    double totalFees = 50000;
-    double paidFees = 30000;
-    double remainingFees = totalFees - paidFees;
+    final homeProvider = Provider.of<HomeProvider>(context);
+    final matches = homeProvider.filteredStudents
+        .where((s) => s.name.toLowerCase().contains(studentName.toLowerCase()))
+        .toList();
+
+    if (matches.isEmpty) {
+      return const Text('Student not found');
+    }
+
+    final student = matches.first;
+
+    if (student == null) return Text('Student not found');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Student: $studentName",
+          "Student: ${student.name}",
           style: const TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),
         ),
-        const SizedBox(height: 20),
-        _attendanceCard(presentPercentage, presentDays, absentDays),
-        const SizedBox(height: 16),
-        _feesCard(totalFees, paidFees, remainingFees),
-        const SizedBox(height: 16),
-        _resultCard(context, studentName),
       ],
-    );
-  }
-
-  Widget _attendanceCard(
-      double presentPercentage, int presentDays, int absentDays) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                SizedBox(
-                  height: 80,
-                  width: 80,
-                  child: CircularProgressIndicator(
-                    value: presentPercentage / 100,
-                    strokeWidth: 8,
-                    backgroundColor: Colors.grey.shade300,
-                    color: Colors.green,
-                  ),
-                ),
-                Text(
-                  "${presentPercentage.toStringAsFixed(1)}%",
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Attendance",
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Text("Present Days: $presentDays"),
-                  Text("Absent Days: $absentDays"),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _feesCard(double total, double paid, double remaining) {
-    return SizedBox(
-      width: double.infinity,
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "Fees",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 12),
-              Text("Total Fees: ₹${total.toStringAsFixed(2)}"),
-              Text("Fees Paid: ₹${paid.toStringAsFixed(2)}"),
-              Text("Remaining Fees: ₹${remaining.toStringAsFixed(2)}"),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _resultCard(BuildContext context, String studentName) {
-    return InkWell(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ResultScreen(studentName: studentName),
-          ),
-        );
-      },
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            children: [
-              const Icon(Icons.assessment, size: 40, color: Colors.blue),
-              const SizedBox(width: 16),
-              const Text(
-                "View Results",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
