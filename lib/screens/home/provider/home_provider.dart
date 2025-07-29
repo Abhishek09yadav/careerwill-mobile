@@ -17,6 +17,7 @@ class HomeProvider extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
 
   Future<List<Student?>> fetchAllStudents() async {
+    log(">>> fetchAllStudents called");
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -26,10 +27,20 @@ class HomeProvider extends ChangeNotifier {
         endpointUrl: "/student/get-all-students",
         queryParameters: {"page": 1, "limit": 1000},
       );
+      log("status code ---> ${response.statusCode}");
+      log(">>> response.data = ${response.data}");
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = response.data["students"];
-        _allStudents = jsonList.map((json) => Student.fromJson(json)).toList();
+        _allStudents = [];
+        for (var json in jsonList) {
+          try {
+            _allStudents.add(Student.fromJson(json));
+          } catch (e) {
+            log("❌ Failed to parse student: $e\nData: $json");
+          }
+        }
+
         _filteredStudents = _allStudents;
         log("all students ---->   $_allStudents");
       } else {
@@ -51,19 +62,24 @@ class HomeProvider extends ChangeNotifier {
     } else {
       final lowerQuery = query.toLowerCase();
       _filteredStudents = _allStudents.where((student) {
+        final rollMatch =
+            int.tryParse(query) != null && student.rollNo == int.parse(query);
         return student.name.toLowerCase().contains(lowerQuery) ||
             student.id.toLowerCase() == lowerQuery ||
-            student.phone.contains(query);
+            student.phone.contains(query) ||
+            rollMatch;
       }).toList();
     }
+
+    log("Filtered students: ${_filteredStudents.map((e) => e.name).toList()}");
     notifyListeners();
   }
 
-  Future<Student?> fetchStudentById(String studentId) async {
+  Future<Student?> fetchStudentByRollNo(int rollNo) async {
     if (_allStudents.isEmpty) await fetchAllStudents();
 
     try {
-      return _allStudents.firstWhere((s) => s.id == studentId);
+      return _allStudents.firstWhere((s) => s.rollNo == rollNo);
     } catch (_) {
       return null;
     }

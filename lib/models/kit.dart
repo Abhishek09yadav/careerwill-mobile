@@ -1,17 +1,25 @@
 class KitItem {
-  final String name, description, sId;
+  final String id;
+  final String name;
+  final String description;
 
-  KitItem({required this.name, required this.description, required this.sId});
+  KitItem({
+    required this.id,
+    required this.name,
+    required this.description,
+  });
 
   factory KitItem.fromJson(Map<String, dynamic> json) {
     return KitItem(
-      sId: json['_id'],
-      name: json['name'],
-      description: json['description'],
+      id: json['_id'] ?? '',
+      name: json['name'] ?? '',
+      description: json['description'] ?? '',
     );
   }
 
+
+
   String toString() {
-    return 'kitItem(name: $name, description: $description, sId: $sId)';
+    return 'kitItem(name: $name, description: $description, sId: $id)';
   }
 }
