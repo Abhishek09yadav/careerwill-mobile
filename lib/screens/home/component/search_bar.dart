@@ -19,7 +19,11 @@ class SearchBar extends StatelessWidget {
         color: Colors.white.withOpacity(0.9),
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 18, offset: const Offset(0, 6)),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 18,
+            offset: const Offset(0, 6),
+          ),
         ],
       ),
       child: Row(
@@ -30,7 +34,11 @@ class SearchBar extends StatelessWidget {
             child: TextField(
               controller: controller,
               onChanged: onChanged,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                // color: Colors.indigo,
+              ),
               decoration: const InputDecoration(
                 hintText: "Search by name, roll no or phone...",
                 border: InputBorder.none,
