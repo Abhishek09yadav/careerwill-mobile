@@ -14,11 +14,11 @@ class StudentDetailScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            if (student.imageUrl?.url.isNotEmpty == true)
+            if (student.imageUrl.url.isNotEmpty == true)
               Center(
                 child: CircleAvatar(
                   radius: 50,
-                  backgroundImage: NetworkImage(student.imageUrl!.url),
+                  backgroundImage: NetworkImage(student.imageUrl.url),
                 ),
               ),
             const SizedBox(height: 20),

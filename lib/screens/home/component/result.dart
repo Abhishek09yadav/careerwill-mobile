@@ -36,8 +36,8 @@ class _ResultScreenState extends State<ResultScreen> {
       return const Scaffold(body: Center(child: Text("No user logged in.")));
     }
 
-    bool isTeacher = loggedInUser.role?.toLowerCase() == "teacher";
-    bool isParent = loggedInUser.role?.toLowerCase() == "parent";
+    bool isTeacher = loggedInUser.role.toLowerCase() == "teacher";
+    bool isParent = loggedInUser.role.toLowerCase() == "parent";
 
     return Scaffold(
       appBar: AppBar(
@@ -49,9 +49,7 @@ class _ResultScreenState extends State<ResultScreen> {
       ),
       body: isTeacher
           ? _buildTeacherView()
-          : _buildResultDetails(
-              selectedStudentName ?? loggedInUser.name ?? "Your Child",
-            ),
+          : _buildResultDetails(selectedStudentName ?? loggedInUser.username),
     );
   }
 

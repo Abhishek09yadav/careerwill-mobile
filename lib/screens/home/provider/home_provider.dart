@@ -36,6 +36,7 @@ class HomeProvider extends ChangeNotifier {
         for (var json in jsonList) {
           try {
             _allStudents.add(Student.fromJson(json));
+            log("We are here");
           } catch (e) {
             log("❌ Failed to parse student: $e\nData: $json");
           }
