@@ -17,7 +17,7 @@ class StudentResultDetailScreen extends StatelessWidget {
       backgroundColor: Colors.grey.shade200,
       appBar: AppBar(
         title: Text(
-          result.student,
+          capitalizeFirstLetter(result.student),
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,

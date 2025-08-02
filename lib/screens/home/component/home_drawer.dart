@@ -14,7 +14,7 @@ Widget buildHomeDrawer(
     child: Column(
       children: [
         _buildHeader(user),
-        _buildDrawerItem(Icons.assessment_outlined, "Search Student", () {
+        _buildDrawerItem(Icons.search, "Search Student", () {
           Navigator.pop(context);
           Navigator.push(
             context,
@@ -28,11 +28,11 @@ Widget buildHomeDrawer(
             MaterialPageRoute(builder: (_) => ResultSearchScreen()),
           );
         }),
-        _buildDrawerItem(Icons.settings_outlined, "Settings", () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Settings coming soon!")),
-          );
-        }),
+        // _buildDrawerItem(Icons.settings_outlined, "Settings", () {
+        //   ScaffoldMessenger.of(context).showSnackBar(
+        //     const SnackBar(content: Text("Settings coming soon!")),
+        //   );
+        // }),
         const Spacer(),
         _buildDrawerItem(
           Icons.logout,

@@ -26,6 +26,14 @@ class TeacherViewResult extends StatelessWidget {
         log("Filtered results count: ${homeProvider.filteredResults.length}");
         return Column(
           children: [
+            Text(
+              "Search Student result",
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 20,
+                color: Colors.indigo,
+              ),
+            ),
             SearchBar(controller: searchController, onChanged: onSearchChanged),
 
             if (homeProvider.isLoading)

@@ -164,4 +164,10 @@ class HomeProvider extends ChangeNotifier {
   notifyListeners();
 }
 
+void clearSearchResult() {
+  filteredResults = [];
+  notifyListeners();
+}
+
+
 }

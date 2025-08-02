@@ -1,5 +1,8 @@
+import 'package:careerwill/provider/home_provider.dart';
+import 'package:careerwill/screens/result/components/result_details.dart';
 import 'package:flutter/material.dart';
 import 'package:careerwill/models/student.dart';
+import 'package:provider/provider.dart';
 
 class StudentDetailScreen extends StatelessWidget {
   final Student student;
@@ -8,6 +11,7 @@ class StudentDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<HomeProvider>(context, listen: false);
     return Scaffold(
       backgroundColor: Colors.grey[200],
       appBar: AppBar(title: Text(student.name)),
@@ -110,14 +114,36 @@ class StudentDetailScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(15),
                   ),
                 ),
-                onPressed: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => const ResultScreen(),
-                  //   ),
-                  // );
+                onPressed: () async {
+                  final provider = Provider.of<HomeProvider>(
+                    context,
+                    listen: false,
+                  );
+                  final rollNoQuery = student.rollNo.toString();
+
+                  await provider.searchResult(rollNoQuery);
+
+                  if (provider.filteredResults.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("No results found for this student"),
+                      ),
+                    );
+                    return;
+                  }
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => StudentResultDetailScreen(
+                        result: provider
+                            .filteredResults
+                            .first, // or show list of results
+                      ),
+                    ),
+                  );
                 },
+
                 child: const Text(
                   "View Result",
                   style: TextStyle(color: Colors.black, fontSize: 16),
@@ -138,12 +164,12 @@ class StudentDetailScreen extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {
-                //   Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //       builder: (context) => const ResultScreen(),
-                //     ),
-                //   );
+                  //   Navigator.push(
+                  //     context,
+                  //     MaterialPageRoute(
+                  //       builder: (context) => const ResultScreen(),
+                  //     ),
+                  //   );
                 },
                 child: const Text(
                   "View Attendance",

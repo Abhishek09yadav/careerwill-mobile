@@ -3,7 +3,7 @@ class Result {
   final int rollNo, total, rank;
   final List<Subjects> subjects;
   final String? date;
-  final double percentile;
+  final num percentile;
 
   Result({
     required this.id,

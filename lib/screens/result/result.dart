@@ -29,16 +29,23 @@ class _ResultSearchScreenState extends State<ResultSearchScreen> {
   }
 
   void _onSearchChanged(String query) {
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
+  if (_debounce?.isActive ?? false) _debounce!.cancel();
 
-    _debounce = Timer(const Duration(milliseconds: 500), () {
-      setState(() {
-        selectedStudentName = query;
-      });
-
-      Provider.of<HomeProvider>(context, listen: false).searchResult(query);
+  _debounce = Timer(const Duration(milliseconds: 500), () {
+    setState(() {
+      selectedStudentName = query;
     });
-  }
+
+    final homeProvider = Provider.of<HomeProvider>(context, listen: false);
+
+    if (query.trim().isEmpty) {
+      homeProvider.clearSearchResult(); // 👈 Create and call this function
+    } else {
+      homeProvider.searchResult(query);
+    }
+  });
+}
+
 
   @override
   Widget build(BuildContext context) {

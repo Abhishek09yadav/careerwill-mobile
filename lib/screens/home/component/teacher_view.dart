@@ -23,17 +23,22 @@ class TeacherView extends StatelessWidget {
       builder: (context, homeProvider, _) {
         return Column(
           children: [
-            // Always show the search bar
+            Text(
+              "Search Student",
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 20,
+                color: Colors.indigo,
+              ),
+            ),
             SearchBar(controller: searchController, onChanged: onSearchChanged),
 
-            // Show loading below the search bar
             if (homeProvider.isLoading)
               const Padding(
                 padding: EdgeInsets.all(16.0),
                 child: CircularProgressIndicator(),
               ),
 
-            // Show filtered results or empty state
             if (!homeProvider.isLoading)
               if (selectedStudentName?.isNotEmpty == true)
                 Expanded(
