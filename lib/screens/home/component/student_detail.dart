@@ -9,18 +9,33 @@ class StudentDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[200],
       appBar: AppBar(title: Text(student.name)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            if (student.imageUrl.url.isNotEmpty == true)
-              Center(
-                child: CircleAvatar(
-                  radius: 50,
-                  backgroundImage: NetworkImage(student.imageUrl.url),
-                ),
-              ),
+            student.imageUrl.url.isNotEmpty
+                ? Center(
+                    child: CircleAvatar(
+                      radius: 50,
+                      backgroundImage: NetworkImage(student.imageUrl.url),
+                    ),
+                  )
+                : CircleAvatar(
+                    radius: 50,
+                    backgroundColor: Colors.white70,
+                    child: Text(
+                      student.name.isNotEmpty
+                          ? student.name[0].toUpperCase()
+                          : "?",
+                      style: const TextStyle(
+                        fontSize: 28,
+                        color: Colors.indigo,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
             const SizedBox(height: 20),
 
             Card(
@@ -44,38 +59,122 @@ class StudentDetailScreen extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            Card(
-              elevation: 3,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Kit Items",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    if (student.kit.isNotEmpty)
-                      ...student.kit.map(
-                        (kit) => ListTile(
-                          leading: const Icon(
-                            Icons.check_circle_outline,
-                            color: Colors.blue,
-                          ),
-                          title: Text(kit.name),
-                          subtitle: Text(kit.description),
+            SizedBox(
+              width: double.infinity,
+              child: Card(
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Kit Items",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
-                      )
-                    else
-                      const Text("No kit items assigned."),
-                  ],
+                      ),
+                      const SizedBox(height: 10),
+                      if (student.kit.isNotEmpty)
+                        ...student.kit.map(
+                          (kit) => ListTile(
+                            leading: const Icon(
+                              Icons.check_circle_outline,
+                              color: Colors.blue,
+                            ),
+                            title: Text(kit.name),
+                            subtitle: Text(kit.description),
+                          ),
+                        )
+                      else
+                        const Text("No kit items assigned."),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: 24,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                ),
+                onPressed: () {
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) => const ResultScreen(),
+                  //   ),
+                  // );
+                },
+                child: const Text(
+                  "View Result",
+                  style: TextStyle(color: Colors.black, fontSize: 16),
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: 24,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                ),
+                onPressed: () {
+                //   Navigator.push(
+                //     context,
+                //     MaterialPageRoute(
+                //       builder: (context) => const ResultScreen(),
+                //     ),
+                //   );
+                },
+                child: const Text(
+                  "View Attendance",
+                  style: TextStyle(color: Colors.black, fontSize: 16),
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: 24,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                ),
+                onPressed: () {
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) => const ResultScreen(),
+                  //   ),
+                  // );
+                },
+                child: const Text(
+                  "View Fee details",
+                  style: TextStyle(color: Colors.black, fontSize: 16),
                 ),
               ),
             ),

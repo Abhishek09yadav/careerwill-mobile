@@ -1,32 +1,33 @@
 class ParentModel {
   final String id;
-  final String username;
-  final String role;
+  final String occupation;
+  final String fatherName;
   final String email;
-  final String phone;
+  final String motherName;
+  final String parentContact;
 
   ParentModel({
     required this.id,
-    required this.username,
-    required this.role,
+    required this.occupation,
+    required this.fatherName,
     required this.email,
-    required this.phone,
+    required this.motherName,
+    required this.parentContact
   });
 
   factory ParentModel.fromJson(Map<String, dynamic> json) {
     return ParentModel(
       id: json['_id'] ?? '',
-      username: json['username'] ?? '',
-      role: json['role'] ?? '',
       email: json['email'] ?? '',
-      phone: json['phone'] ?? '',
+      occupation:  json['occupation'] ?? '', 
+      fatherName: json['fatherName'] ?? '', 
+      motherName:  json['motherName'] ?? '', 
+      parentContact: json['parentContact'] ?? '',
     );
   }
 
-
-
   @override
   String toString() {
-    return 'Parent(id: $id, username: $username, email: $email, phone: $phone)';
+    return 'Parent(id: $id,, email: $email, occupation: $occupation, fatherName: $fatherName, motherName: $motherName, parentContact: $parentContact)';
   }
 }

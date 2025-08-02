@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:careerwill/models/student.dart';
-import 'package:careerwill/screens/home/provider/home_provider.dart';
+import 'package:careerwill/provider/home_provider.dart';
 import 'package:careerwill/screens/auth/login/provider/user_provider.dart';
 import 'package:careerwill/screens/home/component/student_detail.dart';
 

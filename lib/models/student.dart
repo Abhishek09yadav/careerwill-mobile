@@ -10,7 +10,7 @@ class Student {
   final List<KitItem> kit;
   final String? feeId;
   final int rollNo;
-  final String parent;
+  final ParentModel? parent;
   final String previousSchoolName,
       medium,
       category,
@@ -31,7 +31,7 @@ class Student {
     required this.kit,
     this.feeId,
     required this.rollNo,
-    required this.parent,
+    this.parent,
     required this.previousSchoolName,
     required this.medium,
     required this.category,
@@ -62,7 +62,9 @@ class Student {
       rollNo: json['rollNo'] is int
           ? json['rollNo']
           : int.tryParse(json['rollNo'].toString()) ?? 0,
-      parent: json['parent'],
+      parent: json['parent'] != null
+          ? ParentModel.fromJson(json['parent'])
+          : null,
       previousSchoolName: json['previousSchoolName'] ?? '',
       medium: json['medium'] ?? '',
       category: json['category'] ?? '',

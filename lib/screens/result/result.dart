@@ -1,22 +1,22 @@
 import 'dart:async';
 
-import 'package:careerwill/screens/home/component/home_appbar.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:careerwill/screens/auth/login/provider/user_provider.dart';
+import 'package:careerwill/screens/home/component/home_appbar.dart';
 import 'package:careerwill/screens/home/component/home_drawer.dart';
-import 'package:careerwill/screens/home/component/teacher_view.dart';
 import 'package:careerwill/screens/home/component/parent_view.dart';
 import 'package:careerwill/provider/home_provider.dart';
+import 'package:careerwill/screens/result/components/teacher_view.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class ResultSearchScreen extends StatefulWidget {
+  const ResultSearchScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  _ResultSearchScreenState createState() => _ResultSearchScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _ResultSearchScreenState extends State<ResultSearchScreen> {
   final TextEditingController searchController = TextEditingController();
   String? selectedStudentName;
   Timer? _debounce;
@@ -36,24 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
         selectedStudentName = query;
       });
 
-      Provider.of<HomeProvider>(context, listen: false).searchStudent(query);
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final user = Provider.of<UserProvider>(
-        context,
-        listen: false,
-      ).getLoginUsr();
-      debugPrint("Logged-in User Students: ${user?.students}");
-
-      // 🔥 Only fetch students if role is parent
-      if (user != null && user.role.toLowerCase() == "parent") {
-        Provider.of<HomeProvider>(context, listen: false).fetchAllStudents();
-      }
+      Provider.of<HomeProvider>(context, listen: false).searchResult(query);
     });
   }
 
@@ -74,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: buildHomeAppBar(loggedInUser.username),
       drawer: buildHomeDrawer(context, loggedInUser, userProvider),
       body: isTeacher
-          ? TeacherView(
+          ? TeacherViewResult(
               searchController: searchController,
               selectedStudentName: selectedStudentName,
               onSearchChanged: _onSearchChanged,

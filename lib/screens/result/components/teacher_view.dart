@@ -1,16 +1,18 @@
+import 'dart:developer';
+
+import 'package:careerwill/screens/result/components/empty_result_placeholder.dart';
+import 'package:careerwill/screens/result/components/result_card.dart';
 import 'package:flutter/material.dart' hide SearchBar;
 import 'package:provider/provider.dart';
 import 'package:careerwill/provider/home_provider.dart';
 import 'package:careerwill/screens/home/component/search_bar.dart';
-import 'package:careerwill/screens/home/component/empty_student_placeholder.dart';
-import 'package:careerwill/screens/home/component/student_card.dart';
 
-class TeacherView extends StatelessWidget {
+class TeacherViewResult extends StatelessWidget {
   final TextEditingController searchController;
   final String? selectedStudentName;
   final Function(String) onSearchChanged;
 
-  const TeacherView({
+  const TeacherViewResult({
     required this.searchController,
     required this.selectedStudentName,
     required this.onSearchChanged,
@@ -21,26 +23,23 @@ class TeacherView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<HomeProvider>(
       builder: (context, homeProvider, _) {
+        log("Filtered results count: ${homeProvider.filteredResults.length}");
         return Column(
           children: [
-            // Always show the search bar
             SearchBar(controller: searchController, onChanged: onSearchChanged),
 
-            // Show loading below the search bar
             if (homeProvider.isLoading)
               const Padding(
                 padding: EdgeInsets.all(16.0),
                 child: CircularProgressIndicator(),
               ),
 
-            // Show filtered results or empty state
             if (!homeProvider.isLoading)
-              if (selectedStudentName?.isNotEmpty == true)
-                Expanded(
-                  child: StudentList(students: homeProvider.filteredStudents),
-                )
-              else
-                const Expanded(child: EmptyStudentPlaceholder()),
+              Expanded(
+                child: homeProvider.filteredResults.isEmpty
+                    ? const EmptyResultPlaceholder()
+                    : StudentResultList(results: homeProvider.filteredResults),
+              ),
           ],
         );
       },
