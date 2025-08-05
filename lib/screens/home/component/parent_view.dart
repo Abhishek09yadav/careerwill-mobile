@@ -2,11 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:careerwill/models/student.dart';
 import 'package:careerwill/provider/home_provider.dart';
-import 'package:careerwill/screens/auth/login/provider/user_provider.dart';
+import 'package:careerwill/provider/user_provider.dart';
 import 'package:careerwill/screens/home/component/student_detail.dart';
 
-class ParentView extends StatelessWidget {
+class ParentView extends StatefulWidget {
   const ParentView({super.key});
+
+  @override
+  State<ParentView> createState() => _ParentViewState();
+}
+
+class _ParentViewState extends State<ParentView> {
+  late Future<void> _fetchFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    final homeProvider = Provider.of<HomeProvider>(context, listen: false);
+    _fetchFuture = homeProvider.fetchAllStudents();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,27 +28,39 @@ class ParentView extends StatelessWidget {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final loggedInUser = userProvider.getLoginUsr();
 
-    if (loggedInUser == null || loggedInUser.students.isEmpty) {
-      return const Center(
-        child: Text("No student data linked to this parent."),
-      );
-    }
+    return FutureBuilder(
+      future: _fetchFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-    final studentIds = loggedInUser.students.map((e) => e.toString()).toSet();
+        if (loggedInUser == null || loggedInUser.students.isEmpty) {
+          return const Center(
+            child: Text("No student data linked to this parent."),
+          );
+        }
 
-    final studentList = homeProvider.filteredStudents
-        .where((student) => studentIds.contains(student.id.toString()))
-        .toList();
+        final studentIds = loggedInUser.students
+            .map((e) => e.toString())
+            .toSet();
+        final studentList = homeProvider.allStudents
+            .where((student) => studentIds.contains(student.id.toString()))
+            .toList();
 
-    if (studentList.isEmpty) {
-      return const Center(child: Text("No students found for this parent."));
-    }
+        if (studentList.isEmpty) {
+          return const Center(
+            child: Text("No students found for this parent."),
+          );
+        }
 
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: studentList.length,
-      itemBuilder: (context, index) {
-        return _buildStudentCard(studentList[index], context);
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: studentList.length,
+          itemBuilder: (context, index) {
+            return _buildStudentCard(studentList[index], context);
+          },
+        );
       },
     );
   }
@@ -86,6 +112,7 @@ class ParentView extends StatelessWidget {
               Text("Roll No: ${student.rollNo}"),
               Text("Phone: ${student.phone}"),
               Text("Address: ${student.address}"),
+              Text("Father Name: ${student.parent!.fatherName}"),
               const SizedBox(height: 12),
               const Text(
                 "Kit Items:",

@@ -10,12 +10,13 @@ class HomeProvider extends ChangeNotifier {
 
   List<Student> _allStudents = [];
   List<Student> _filteredStudents = [];
-  List<Result> _allResults = [];
+  final List<Result> _allResults = [];
   List<Result> filteredResults = [];
   bool _isLoading = false;
   String? _errorMessage;
 
   List<Student> get filteredStudents => _filteredStudents;
+  List<Student> get allStudents => _allStudents;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
@@ -23,7 +24,6 @@ class HomeProvider extends ChangeNotifier {
     log(">>> fetchAllStudents called");
     _isLoading = true;
     _errorMessage = null;
-    notifyListeners();
 
     try {
       final response = await _dio.getItems(
@@ -138,36 +138,37 @@ class HomeProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchStudentsByIds(List<String> ids) async {
-  _isLoading = true;
-  _errorMessage = null;
-  notifyListeners();
+  Future<List<Student>> fetchStudentsByIds(List<String> ids) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
 
-  try {
-    final response = await _dio.getItems(
-      endpointUrl: "/student/get-students-by-ids",
-      queryParameters: {'ids': ids.join(',')},
-    );
+    try {
+      final response = await _dio.getItems(
+        endpointUrl: "/student/get-student-by-id",
+        queryParameters: {'ids': ids.join(',')},
+      );
 
-    if (response.statusCode == 200) {
-      final List jsonList = response.data['students'];
-      _allStudents = jsonList.map((json) => Student.fromJson(json)).toList();
-      _filteredStudents = _allStudents;
-    } else {
-      _errorMessage = "Failed to load students for parent.";
+      if (response.statusCode == 200) {
+        final List jsonList = response.data['students'];
+        _allStudents = jsonList.map((json) => Student.fromJson(json)).toList();
+        _filteredStudents = _allStudents;
+        return _allStudents;
+      } else {
+        _errorMessage = "Failed to load students for parent.";
+      }
+    } catch (e) {
+      _errorMessage = e.toString();
     }
-  } catch (e) {
-    _errorMessage = e.toString();
+
+    _isLoading = false;
+    notifyListeners();
+
+    return [];
   }
 
-  _isLoading = false;
-  notifyListeners();
-}
-
-void clearSearchResult() {
-  filteredResults = [];
-  notifyListeners();
-}
-
-
+  void clearSearchResult() {
+    filteredResults = [];
+    notifyListeners();
+  }
 }

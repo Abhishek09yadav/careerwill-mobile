@@ -14,20 +14,30 @@ class User {
     required this.token,
     required this.username,
     required this.phone,
-    required this.students
+    required this.students,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => User(
     id: json["_id"] ?? "",
     email: json["email"] ?? "",
-    role: json["role"] ?? "",
+    role: json["role"] ?? "parent", // fallback
     token: json["token"] ?? "",
     phone: json["phone"] ?? "",
     username: json["username"] ?? "",
-     students: (json["students"] as List<dynamic>?)
-                ?.map((id) => id.toString())
-                .toList() ??
-            [],
+    students:
+        (json["students"] as List<dynamic>?)
+            ?.map((student) {
+              if (student is Map && student.containsKey("_id")) {
+                return student["_id"].toString();
+              } else if (student is String) {
+                return student;
+              } else {
+                return "";
+              }
+            })
+            .where((id) => id.isNotEmpty)
+            .toList() ??
+        [],
   );
 
   Map<String, dynamic> toJson() => {

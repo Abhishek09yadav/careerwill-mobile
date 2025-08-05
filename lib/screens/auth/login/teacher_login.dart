@@ -1,7 +1,8 @@
 import 'package:careerwill/components/auth/textfield.dart';
 import 'package:careerwill/components/bgIcons.dart';
 import 'package:careerwill/components/mybutton.dart';
-import 'package:careerwill/screens/auth/login/provider/user_provider.dart';
+import 'package:careerwill/provider/user_provider.dart';
+import 'package:careerwill/screens/auth/login/parent_login.dart';
 import 'package:careerwill/screens/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -98,9 +99,16 @@ class _LoginPageState extends State<LoginPage> {
 
                   Center(
                     child: TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ParentLogin(),
+                          ),
+                        );
+                      },
                       child: const Text(
-                        "Forgot Password?",
+                        "Login as Parent",
                         style: TextStyle(
                           color: Colors.blue,
                           fontSize: 14,

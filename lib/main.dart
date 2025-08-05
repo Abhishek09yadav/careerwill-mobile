@@ -1,6 +1,8 @@
-import 'package:careerwill/screens/auth/login/login.dart';
-import 'package:careerwill/screens/auth/login/provider/user_provider.dart';
+import 'package:careerwill/provider/attendance_provider.dart';
+import 'package:careerwill/screens/auth/login/teacher_login.dart';
+import 'package:careerwill/provider/user_provider.dart';
 import 'package:careerwill/provider/home_provider.dart';
+import 'package:careerwill/screens/fee/provider/fee_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -10,6 +12,8 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (context) => UserProvider()),
         ChangeNotifierProvider(create: (context) => HomeProvider()),
+        ChangeNotifierProvider(create: (context) => FeeProvider()),
+        ChangeNotifierProvider(create: (context) => AttendanceProvider()),
       ],
       child: const MyApp(),
     ),

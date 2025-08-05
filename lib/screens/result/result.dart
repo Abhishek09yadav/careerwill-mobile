@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:careerwill/screens/auth/login/provider/user_provider.dart';
+import 'package:careerwill/provider/user_provider.dart';
 import 'package:careerwill/screens/home/component/home_appbar.dart';
 import 'package:careerwill/screens/home/component/home_drawer.dart';
 import 'package:careerwill/screens/home/component/parent_view.dart';

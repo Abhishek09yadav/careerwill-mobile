@@ -1,6 +1,6 @@
 import 'package:careerwill/models/user.dart';
-import 'package:careerwill/screens/auth/login/login.dart';
-import 'package:careerwill/screens/auth/login/provider/user_provider.dart';
+import 'package:careerwill/screens/auth/login/teacher_login.dart';
+import 'package:careerwill/provider/user_provider.dart';
 import 'package:careerwill/screens/home/home.dart';
 import 'package:careerwill/screens/result/result.dart';
 import 'package:flutter/material.dart';
